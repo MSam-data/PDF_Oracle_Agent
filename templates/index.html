@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Oracle | Samuel Makumbe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); min-height: 100vh; color: #f1f5f9; }
+        #aiOutput { max-height: 400px; overflow-y: auto; }
+    </style>
+</head>
+<body class="p-4 md:p-10 font-sans">
+    <div class="max-w-4xl mx-auto glass rounded-3xl shadow-2xl p-6 md:p-10 text-gray-800">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">📄 PDF Oracle Agent</h1>
+            <div id="aiStatus" class="text-sm font-mono text-gray-400 animate-pulse">
+                📡 Initializing AI Infrastructure...
+            </div>
+        </header>
+
+        <div class="space-y-6">
+            <div id="uploadSection" class="border-4 border-dashed border-indigo-100 rounded-2xl p-8 text-center bg-indigo-50 hover:bg-white hover:border-indigo-400 transition-all cursor-pointer">
+                <input type="file" id="pdfFile" accept=".pdf" class="hidden">
+                <label for="pdfFile" class="cursor-pointer block">
+                    <span class="text-indigo-600 font-bold text-lg">Click to Upload PDF</span>
+                    <div id="fileName" class="mt-4 p-2 bg-green-100 text-green-700 rounded-lg hidden font-bold text-sm"></div>
+                </label>
+            </div>
+
+            <textarea id="userPrompt" rows="3" 
+                class="w-full p-5 border-2 border-gray-100 rounded-2xl focus:border-indigo-500 focus:ring-0 outline-none transition shadow-sm text-gray-700"
+                placeholder="Ask a question about the document..."></textarea>
+
+            <button id="askBtn" class="w-full bg-indigo-600 text-white py-5 rounded-2xl font-black text-lg hover:bg-indigo-700 transition-all shadow-lg active:scale-95">
+                Consult Oracle
+            </button>
+
+            <div id="responseArea" class="hidden space-y-4">
+                <div class="flex items-center justify-between px-2">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-2 h-6 bg-indigo-600 rounded-full"></div>
+                        <h3 class="font-bold text-xl text-gray-800">Oracle Insight</h3>
+                    </div>
+                    <button id="copyBtn" class="text-xs font-bold bg-gray-200 text-gray-600 px-3 py-1 rounded hover:bg-indigo-100 hover:text-indigo-600 transition">
+                        Copy Text
+                    </button>
+                </div>
+                
+                <div id="aiOutput" class="p-8 bg-white rounded-3xl border-2 border-gray-100 text-gray-700 leading-relaxed shadow-inner">
+                    </div>
+
+                <button onclick="location.reload()" class="w-full py-3 text-sm font-semibold text-gray-400 hover:text-indigo-600 transition">
+                    🔄 Use Another Document
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('pdfFile');
+        const fileNameDisplay = document.getElementById('fileName');
+        const statusDiv = document.getElementById('aiStatus');
+        const copyBtn = document.getElementById('copyBtn');
+        const aiOutput = document.getElementById('aiOutput');
+
+        // Initial AI Verification
+        window.onload = async () => {
+            try {
+                const res = await fetch('/status');
+                const data = await res.json();
+                statusDiv.textContent = data.status;
+                statusDiv.classList.remove('animate-pulse', 'text-gray-400');
+                statusDiv.classList.add('text-indigo-600', 'font-bold');
+            } catch (e) {
+                statusDiv.textContent = "❌ Backend Server Offline";
+            }
+        };
+
+        // File Selection Logic
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) {
+                fileNameDisplay.textContent = "✓ " + fileInput.files[0].name;
+                fileNameDisplay.classList.remove('hidden');
+            }
+        });
+
+        // Copy Mechanism
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(aiOutput.innerText);
+            copyBtn.textContent = "Copied!";
+            copyBtn.classList.add("bg-green-100", "text-green-600");
+            setTimeout(() => {
+                copyBtn.textContent = "Copy Text";
+                copyBtn.classList.remove("bg-green-100", "text-green-600");
+            }, 2000);
+        };
+
+        // Query Logic
+        document.getElementById('askBtn').onclick = async () => {
+            const file = fileInput.files[0];
+            const prompt = document.getElementById('userPrompt').value;
+            const responseArea = document.getElementById('responseArea');
+
+            if (!file || !prompt) {
+                alert("Please provide both a document and a question.");
+                return;
+            }
+
+            responseArea.classList.remove('hidden');
+            aiOutput.innerHTML = '<div class="flex items-center space-x-3 text-indigo-500"><div class="animate-spin h-5 w-5 border-t-2 border-indigo-600 rounded-full"></div><span>Analyzing PDF data...</span></div>';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('prompt', prompt);
+
+            try {
+                const response = await fetch('/query', { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                // Format response: replace newlines with breaks for structured look
+                aiOutput.innerText = data.response;
+            } catch (error) {
+                aiOutput.textContent = "Connection error.";
+            }
+        };
+    </script>
+</body>
+</html>
