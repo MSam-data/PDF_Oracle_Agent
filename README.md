@@ -29,5 +29,5 @@ add your API keys as:
 - `GOOGLE_API_KEY=AIza_YOUR_API_KEY_1`
 - `GOOGLE_API_KEY_2=AIza_YOUR_API_KEY_2`
 
-**Run the application**
+4. **Run the application**
 - `python main.py`
