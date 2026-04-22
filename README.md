@@ -22,7 +22,7 @@ A high-performance RAG (Retrieval-Augmented Generation) system built with **Pyth
    cd PDF_Oracle_Agent
 
 2. **Install dependencies**
-`pip install -r requirements.txt`
+- `pip install -r requirements.txt`
 
 3. **Find .env file**
 add your API keys as:
