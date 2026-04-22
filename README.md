@@ -20,3 +20,14 @@ A high-performance RAG (Retrieval-Augmented Generation) system built with **Pyth
    ```bash
    git clone https://github.com/MSam-data/PDF_Oracle_Agent.git
    cd PDF_Oracle_Agent
+
+2. **Install dependencies**
+`pip install -r requirements.txt`
+
+3. **Find .env file**
+add your API keys as:
+- `GOOGLE_API_KEY=AIza_YOUR_API_KEY_1`
+- `GOOGLE_API_KEY_2=AIza_YOUR_API_KEY_2`
+
+**Run the application**
+- `python main.py`
