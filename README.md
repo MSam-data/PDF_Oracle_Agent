@@ -31,3 +31,22 @@ add your API keys as:
 
 4. **Run the application**
 - `python main.py`
+
+## The PDF Oracle (RAG Agent) pipeline Workflow.
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant Flask_Backend
+    participant PDF_Engine
+    participant Gemini_AI
+
+    User->>Frontend: Upload PDF + Prompt
+    Frontend->>Flask_Backend: POST /query (File + Text)
+    Flask_Backend->>PDF_Engine: Extract Text (PyPDF2)
+    PDF_Engine-->>Flask_Backend: Raw Text Data
+    Flask_Backend->>Gemini_AI: Prompt + Document Context
+    Gemini_AI-->>Flask_Backend: Synthesized Answer
+    Flask_Backend-->>Frontend: JSON Response
+    Frontend-->>User: Structured Display & Copy Option
+```
