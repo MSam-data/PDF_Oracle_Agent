@@ -3,3 +3,4 @@ pypdf2
 google-genai
 python-dotenv
 gunicorn
+google-api-core
